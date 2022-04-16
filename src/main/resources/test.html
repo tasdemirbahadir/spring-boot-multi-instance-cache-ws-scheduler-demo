@@ -1,0 +1,64 @@
+<html>
+<head>
+    <title>firststepitsolution web socket demo</title>
+
+    <script type="text/javascript">
+        var stompClient = null;
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('response').innerHTML = '';
+        }
+        function connect() {
+            var socket = new SockJS('http://127.0.0.1:8080/ws'); // domainname/ws
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                setConnected(true);
+                console.log('Connected: ' + frame);
+                var from = document.getElementById('from').value;
+                stompClient.subscribe('/user/' + from + '/queue/notification',
+                    function(messageOutput) {
+                        console.log('log something here')
+                        showMessageOutput(JSON.parse(messageOutput.body));
+                    });
+            });
+        }
+        function disconnect() {
+            if (stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+        function showMessageOutput(messageOutput) {
+            var response = document.getElementById('response');
+            var p = document.createElement('p');
+            p.style.wordWrap = 'break-word';
+            p.appendChild(document.createTextNode(messageOutput.title + ": "
+                + messageOutput.id + " (" + messageOutput.message + ")"));
+            response.appendChild(p);
+        }
+    </script>
+</head>
+<body onload="disconnect()">
+<div>
+    <div>
+        <input type="text" size=200 id="from" placeholder="pass user unique id to receive message to specific user" />
+    </div>
+    <br />
+    <div>
+        <button id="connect" onclick="connect();">Connect</button>
+        <button id="disconnect" disabled="disabled" onclick="disconnect();">
+            Disconnect</button>
+        <p id="response"></p>
+    </div>
+    <br />
+
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</div>
+</body>
+</html>

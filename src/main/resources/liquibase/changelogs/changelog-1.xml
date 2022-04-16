@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="16.04.2022-14:26" author="bahadir.tasdemir">
+        <createTable tableName="book">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(200)" />
+            <column name="author" type="varchar(200)" />
+        </createTable>
+        <createTable tableName="book_days">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="book_id" type="bigint">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="count" type="bigint" defaultValue="0" />
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="book_id"
+                                 baseTableName="book_days"
+                                 constraintName="fk_book_days_book"
+                                 referencedColumnNames="id"
+                                 referencedTableName="book"
+                                 onDelete="CASCADE"
+                                 onUpdate="CASCADE"
+        />
+    </changeSet>
+    <changeSet id="16.04.2022-15:17" author="bahadir.tasdemir">
+        <createTable tableName="shedlock">
+            <column name="name" type="varchar(64)">
+                <constraints nullable="false"
+                             primaryKey="true"/>
+            </column>
+            <column name="lock_until" type="timestamp">
+                <constraints nullable="false" />
+            </column>
+            <column name="locked_at" type="timestamp">
+                <constraints nullable="false" />
+            </column>
+            <column name="locked_by" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
