@@ -9,6 +9,8 @@ import com.millimetric.demo.redis.MemberNotificationRedisSender;
 import com.millimetric.demo.redis.model.MemberPushNotification;
 import com.millimetric.demo.service.model.BookResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class BookService {
     private final MemberNotificationRedisSender memberNotificationRedisSender;
 
     @Transactional
+    @CacheEvict(value = "cacheManager", allEntries = true)
     public void createBook(CreateBookRequest request) {
         var book = bookRepository.save(Book.builder()
                 .name(request.name())
@@ -45,6 +48,7 @@ public class BookService {
         );
     }
 
+    @Cacheable("cacheManager")
     public List<BookResponse> getBooks(int page, int size) {
         return bookRepository.findAll(PageRequest.of(page, size))
                 .stream()
